@@ -33,6 +33,8 @@ const NotificationsDrawer = lazy(() => import('./components/NotificationsDrawer'
 const Forbidden = lazy(() => import('./pages/Forbidden'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+
 // <Navbar />
 function AppContent() {
   useServerHealth();
@@ -89,7 +91,16 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/forbidden" element={<Forbidden />} />
           <Route path="*" element={<NotFound />} />
           

@@ -33,6 +33,8 @@ console.log('Connection config:', db.client.config.connection);
 const routes = [
   { path: '/auth', route: './routes/auth' },
   { path: '/logs', route: './routes/logs' },
+  { path: '/news', route: './routes/news' },
+  { path: '/notifications', route: './routes/notifications' }
 ];
 
 routes.forEach(route => {

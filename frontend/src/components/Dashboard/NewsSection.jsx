@@ -1,27 +1,44 @@
-import { Box, Chip, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Chip, Typography, Skeleton } from "@mui/material";
+
+import { getNews } from "../../api/newsHelper";
 
 export default function NewsSection() {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const news = [
-    {
-      area: "Operaciones",
-      date: "Hoy · 14:32",
-      title: "Nueva ruta de recolección disponible en tu zona.",
-      recent: true
-    },
-    {
-      area: "Sistema",
-      date: "Ayer · 18:10",
-      title: "Actualización del portal ARS.",
-      recent: false
-    },
-    {
-      area: "Eventos",
-      date: "12/06/2026 · 10:45",
-      title: "Nueva capacitación disponible.",
-      recent: false
+  useEffect(() => {
+    async function fetchNews() {
+      try {
+        const data = await getNews();
+        setNews(data);
+      } catch (err) {
+        console.error("Error loading news:", err);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+
+    fetchNews();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          bgcolor: "#FFFFFF",
+          border: "1px solid #D8EDAB",
+          borderRadius: 1,
+          p: { xs: 2, md: 3 }
+        }}
+      >
+        <Skeleton width={200} height={30} />
+        <Skeleton height={60} sx={{ mt: 2 }} />
+        <Skeleton height={60} sx={{ mt: 1 }} />
+        <Skeleton height={60} sx={{ mt: 1 }} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -42,58 +59,64 @@ export default function NewsSection() {
         Noticias y Actualizaciones
       </Typography>
 
-      {news.map((item, i) => (
-        <Box key={i}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              py: 1.5,
-              flexDirection: { xs: "column", md: "row" }
-            }}
-          >
-            {/* Dot */}
+      {news.length === 0 ? (
+        <Typography sx={{ color: "#6B7280" }}>
+          No hay noticias disponibles.
+        </Typography>
+      ) : (
+        news.map((item, i) => (
+          <Box key={item.id || i}>
             <Box
               sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: item.recent ? "#6E9B2D" : "#B9D98A",
-                flexShrink: 0,
-                display: { xs: "none", md: "block" }
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                py: 1.5,
+                flexDirection: { xs: "column", md: "row" }
               }}
-            />
+            >
+              {/* DOT */}
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  bgcolor: item.recent ? "#6E9B2D" : "#B9D98A",
+                  flexShrink: 0,
+                  display: { xs: "none", md: "block" }
+                }}
+              />
 
-            {/* Content */}
-            <Box sx={{ flex: 1, width: "100%" }}>
-              <Typography sx={{ fontWeight: 600, color: "#2F3A1F" }}>
-                {item.title}
-              </Typography>
+              {/* CONTENT */}
+              <Box sx={{ flex: 1, width: "100%" }}>
+                <Typography sx={{ fontWeight: 600, color: "#2F3A1F" }}>
+                  {item.content}
+                </Typography>
 
-              <Typography sx={{ fontSize: "0.8rem", color: "#8AA55A" }}>
-                {item.date}
-              </Typography>
+                <Typography sx={{ fontSize: "0.8rem", color: "#8AA55A" }}>
+                  {item.date || item.created_at}
+                </Typography>
+              </Box>
+
+              {/* CHIP */}
+              <Chip
+                label={item.label}
+                size="small"
+                sx={{
+                  bgcolor: "#F6FAF2",
+                  color: "#6E9B2D",
+                  border: "1px solid #D8EDAB",
+                  fontWeight: 600
+                }}
+              />
             </Box>
 
-            {/* Tag */}
-            <Chip
-              label={item.area}
-              size="small"
-              sx={{
-                bgcolor: "#F6FAF2",
-                color: "#6E9B2D",
-                border: "1px solid #D8EDAB",
-                fontWeight: 600
-              }}
-            />
+            {i < news.length - 1 && (
+              <Box sx={{ borderBottom: "1px solid #EEF5E2" }} />
+            )}
           </Box>
-
-          {i < news.length - 1 && (
-            <Box sx={{ borderBottom: "1px solid #EEF5E2" }} />
-          )}
-        </Box>
-      ))}
+        ))
+      )}
     </Box>
   );
 }

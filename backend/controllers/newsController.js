@@ -8,16 +8,25 @@ const notifyAllUsers = require("../utils/notifyAllUsers");
  */
 
 async function createNews(req, res) {
-  const { content, label } = req.body;
+  const { title, area } = req.body;
 
   try {
+    if (!title || !area) {
+      return res.status(400).json({
+        message: "Title and area are required"
+      });
+    }
+
     const [news] = await db("news")
-      .insert({ content, label })
+      .insert({
+        content: title,
+        label: area
+      })
       .returning("*");
 
     await notifyAllUsers(
       "📰 News Update",
-      label
+      title
     );
 
     res.status(201).json({
@@ -26,7 +35,7 @@ async function createNews(req, res) {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Create news error:", err);
     res.status(500).json({ message: "Error creating news" });
   }
 }

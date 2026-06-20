@@ -56,6 +56,63 @@ router.post("/points/remove", authenticate, async (req, res) => {
 
 router.post("/points/me", authenticate, addUserPoints);
 
+router.get("/users", authenticate, async (req, res) => {
+  try {
+    const db = require("../db");
+
+    const users = await db("users").select(
+      "id",
+      "username",
+      "email",
+      "role",
+      "points",
+      "created_at"
+    );
+
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
+// --------------------
+// ADMIN: UPDATE USER POINTS
+// --------------------
+router.post("/admin/points", authenticate, async (req, res) => {
+  try {
+    const db = require("../db");
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const { userId, amount } = req.body;
+
+    const user = await db("users").where({ id: userId }).first();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newPoints = Math.max(0, (user.points || 0) + amount);
+
+    await db("users")
+      .where({ id: userId })
+      .update({ points: newPoints });
+
+    res.json({
+      message: "Points updated",
+      userId,
+      points: newPoints
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error updating points" });
+  }
+});
+
 // --------------------
 // HEALTH CHECK
 // --------------------
