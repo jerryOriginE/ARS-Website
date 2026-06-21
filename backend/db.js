@@ -60,7 +60,7 @@ async function initializeTables() {
         table.string('title').notNullable();
         table.text('message').notNullable();
         table.boolean('read').defaultTo(false);
-        table.timestamp('date').defaultTo(db.fn.now());
+        table.timestamp('created_at').defaultTo(db.fn.now());
       });
       console.log('Created notifications table');
     }

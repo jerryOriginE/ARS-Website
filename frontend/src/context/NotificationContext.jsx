@@ -1,41 +1,55 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import API_BASE_URL from "../config";
 
 const NotificationContext = createContext();
 
 export function NotificationProvider({ children }) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // simulate backend fetch (replace later with API)
+  const token = localStorage.getItem("token");
+
+  async function fetchNotifications() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/notifications`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      setNotifications(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Notifications fetch error:", err);
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    const fakeData = [
-      {
-        id: 1,
-        title: "Nueva ruta disponible",
-        message: "Se agregó una recolección cerca de ti",
-        date: "Hoy"
-      },
-      {
-        id: 2,
-        title: "Puntos actualizados",
-        message: "+20 puntos añadidos",
-        date: "Ayer"
-      }
-    ];
-
-    setNotifications(fakeData);
+    fetchNotifications();
   }, []);
 
   const openNotifications = () => setOpen(true);
   const closeNotifications = () => setOpen(false);
+
+  // 🔥 THIS IS WHAT YOU WERE MISSING
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <NotificationContext.Provider
       value={{
         open,
         notifications,
+        setNotifications,
         openNotifications,
-        closeNotifications
+        closeNotifications,
+        loading,
+        unreadCount,
+        refreshNotifications: fetchNotifications
       }}
     >
       {children}
@@ -43,5 +57,4 @@ export function NotificationProvider({ children }) {
   );
 }
 
-export const useNotifications = () =>
-  useContext(NotificationContext);
+export const useNotifications = () => useContext(NotificationContext);

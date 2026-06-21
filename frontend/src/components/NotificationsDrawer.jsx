@@ -10,6 +10,27 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { useNotifications } from "../context/NotificationContext";
 
+function formatNotificationDate(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(String(dateString).replace(" ", "T"));
+
+  const now = new Date();
+
+  const diffTime = now - date;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  const time = date.toLocaleTimeString("es-MX", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  if (diffDays === 0) return `Hoy · ${time}`;
+  if (diffDays === 1) return `Ayer · ${time}`;
+
+  return `${date.toLocaleDateString("es-MX")} · ${time}`;
+}
+
 export default function NotificationDrawer() {
   const {
     open,
@@ -92,7 +113,7 @@ export default function NotificationDrawer() {
                   mt: 1
                 }}
               >
-                {n.date}
+                {formatNotificationDate(n.created_at)}
               </Typography>
             </Box>
           ))

@@ -7,9 +7,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@google/model-viewer": "^4.3.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/lab": "^7.0.1-beta.18",
     "@mui/material": "^7.3.4",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.9",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -35,7 +38,8 @@
     "build": "react-scripts build",
     "postbuild": "node -e \"const fs=require('fs');fs.copyFileSync('build/index.html','build/404.html');\"",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "email": "email dev"
   },
   "eslintConfig": {
     "extends": [
@@ -56,10 +60,12 @@
     ]
   },
   "devDependencies": {
+    "@react-email/ui": "^6.6.3",
     "autoprefixer": "^10.5.0",
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.15",
     "react-app-rewired": "^2.2.1",
+    "react-email": "^6.6.3",
     "tailwindcss": "^4.3.0"
   }
 }

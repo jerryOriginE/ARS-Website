@@ -17,7 +17,11 @@ import { calculateLevel } from "../api/levelSystem";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { openNotifications } = useNotifications();
+
+  const {
+    openNotifications,
+    unreadCount
+  } = useNotifications();
 
   const [profile, setProfile] = useState(null);
 
@@ -67,51 +71,24 @@ export default function Navbar() {
         borderBottom: "1px solid #DCE7CC"
       }}
     >
-      {/* LEFT SIDE */}
+      {/* LEFT */}
       <Box>
-        <Typography
-          sx={{
-            fontWeight: 700,
-            color: "#2F3A1F",
-            fontSize: { xs: "1.3rem", md: "2rem" }
-          }}
-        >
-          ¡Hola,{" "}
-          <Box component="span" sx={{ color: "#618132" }}>
-            {username}
-          </Box>
-          !
+        <Typography sx={{ fontWeight: 700, color: "#2F3A1F", fontSize: { xs: "1.3rem", md: "2rem" } }}>
+          ¡Hola, <Box component="span" sx={{ color: "#618132" }}>{username}</Box>!
         </Typography>
 
-        <Typography
-          sx={{
-            mt: 0.5,
-            color: "#6B7280",
-            fontSize: "0.95rem",
-            textTransform: "capitalize"
-          }}
-        >
+        <Typography sx={{ mt: 0.5, color: "#6B7280", fontSize: "0.95rem", textTransform: "capitalize" }}>
           {today}
         </Typography>
 
-        <Typography
-          sx={{
-            color: "#889172",
-            fontSize: "0.85rem"
-          }}
-        >
+        <Typography sx={{ color: "#889172", fontSize: "0.85rem" }}>
           Bienvenido de regreso
         </Typography>
       </Box>
 
-      {/* RIGHT SIDE */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1.5,
-          alignItems: "center"
-        }}
-      >
+      {/* RIGHT */}
+      <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+
         {/* NOTIFICATIONS */}
         <IconButton
           onClick={openNotifications}
@@ -122,13 +99,30 @@ export default function Navbar() {
             bgcolor: "#FFFFFF",
             border: "1px solid #D8EDAB",
             color: "#6E9B2D",
+            position: "relative",
             "&:hover": { bgcolor: "#F8FBF3" }
           }}
         >
           <NotificationsIcon />
+
+          {/* 🔴 RED BADGE */}
+          {unreadCount > 0 && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                bgcolor: "#D14343",
+                border: "2px solid white"
+              }}
+            />
+          )}
         </IconButton>
 
-        {/* USER CARD */}
+        {/* USER */}
         <Box
           sx={{
             bgcolor: "#FFFFFF",
@@ -142,33 +136,14 @@ export default function Navbar() {
             gap: 1
           }}
         >
-          <Avatar
-            sx={{
-              width: 34,
-              height: 34,
-              bgcolor: "#D8EDAB",
-              color: "#4F6B1E"
-            }}
-          />
+          <Avatar sx={{ width: 34, height: 34, bgcolor: "#D8EDAB", color: "#4F6B1E" }} />
 
           <Box>
-            <Typography
-              sx={{
-                fontWeight: 700,
-                fontSize: "0.85rem",
-                color: "#2F3A1F",
-                lineHeight: 1.1
-              }}
-            >
+            <Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: "#2F3A1F" }}>
               {username}
             </Typography>
 
-            <Typography
-              sx={{
-                fontSize: "0.75rem",
-                color: "#6B7280"
-              }}
-            >
+            <Typography sx={{ fontSize: "0.75rem", color: "#6B7280" }}>
               Nivel {level}
             </Typography>
           </Box>
@@ -189,6 +164,7 @@ export default function Navbar() {
         >
           <LogoutIcon />
         </IconButton>
+
       </Box>
     </Box>
   );

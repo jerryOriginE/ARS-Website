@@ -4,6 +4,7 @@ const db = require("../db");
 const logEvent = require("../utils/logger");
 const crypto = require("crypto");
 const { sendVerificationEmail } = require("../utils/mailer");
+const { createNotification } = require("./notificationsController");
 
 const SECRET_KEY = process.env.JWT_SECRET || "ars-secret-key";
 
@@ -48,18 +49,18 @@ async function login(req, res) {
 
   try {
     const user = await db("users").where({ username }).first();
-
+    console.log(`User ${username} logged in`, user);
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const valid = bcrypt.compareSync(password, user.password_hash);
-
+    console.log(`Password valid: ${valid}`);
     if (!valid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log(`trrying  User ${username} logged in`);
+    console.log(`Trying to log in User ${username} - Verified: ${user.is_verified}`);
 
     if (!user.is_verified) {
       return res.status(403).json({
@@ -116,7 +117,6 @@ async function register(req, res) {
           });
         }
 
-
     const passwordHash = bcrypt.hashSync(password, 10);
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -136,6 +136,9 @@ async function register(req, res) {
       .returning(["id", "email"]);
 
     //await sendVerificationEmail(newUser.email, token);
+    // notify user and thanks for registration
+    await createNotification(newUser.id, "Bienvenido a ARS!", "Gracias por registrarte en nuestro sistema de recompensas. ¡Explora las actividades y gana puntos para subir de nivel!");
+
 
     const link = `http://localhost:5000/auth/verify-email?token=${token}`;
 

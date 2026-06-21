@@ -13,7 +13,8 @@ async function createNotification(userId, title, message) {
         user_id: userId,
         title,
         message,
-        read: false
+        read: false,
+        created_at: db.fn.now()
       })
       .returning("*");
 
@@ -31,7 +32,7 @@ async function getUserNotifications(req, res) {
   try {
     const notifications = await db("notifications")
       .where({ user_id: req.user.id })
-      .orderBy("date", "desc");
+      .orderBy("created_at", "desc");
 
     res.json(notifications);
   } catch (err) {

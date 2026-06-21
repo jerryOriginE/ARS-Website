@@ -30,4 +30,8 @@ router.put("/read-all", authenticate, markAllAsRead);
  */
 router.delete("/:id", authenticate, deleteNotification);
 
+router.get("/health", (_, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 module.exports = router;

@@ -34,11 +34,14 @@ const Forbidden = lazy(() => import('./pages/Forbidden'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+const Showcase = lazy(() => import('./pages/Showcase'));
 
 // <Navbar />
 function AppContent() {
   useServerHealth();
   const { checked } = useServerStatus();
+
+  const token = localStorage.getItem('token');
 
   if (!checked) return null; // or splash screen
 
@@ -64,6 +67,7 @@ function AppContent() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/showcase" element={<Showcase />} />
 
           <Route
             path="/dashboard"
@@ -107,8 +111,8 @@ function AppContent() {
         </Routes>
       </Suspense>
 
-    <NotificationsDrawer />
-    <FloatingQRButton />
+    { token && <NotificationsDrawer /> }
+    {token && <FloatingQRButton />}
     </>
   );
 }

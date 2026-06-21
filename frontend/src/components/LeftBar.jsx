@@ -13,6 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import SettingsIcon from "@mui/icons-material/Settings";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
 import logo from "../assets/img/logo.png";
 
@@ -41,7 +42,15 @@ export default function LeftBar() {
       label: "Ajustes",
       path: "/settings",
       icon: <SettingsIcon />
+    },
+    {
+      id: "admin",
+      label: "Administración",
+      path: "/admin",
+      icon: <AdminPanelSettingsIcon />,
+      allowedRoles: ["admin"] // Solo visible para admins
     }
+
   ];
 
   const handleNavigation = (path) => {
@@ -86,6 +95,11 @@ export default function LeftBar() {
 
       {/* Navigation */}
       {menuItems.map((item) => {
+        // Check if the item is allowed for the current user's role
+        const isAllowed = !item.allowedRoles || item.allowedRoles.includes(localStorage.getItem("role"));
+        if (!isAllowed) {
+          return null; // Skip rendering this item
+        }
         const active = location.pathname === item.path;
 
         return (

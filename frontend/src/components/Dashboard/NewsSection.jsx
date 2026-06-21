@@ -3,6 +3,29 @@ import { Box, Chip, Typography, Skeleton } from "@mui/material";
 
 import { getNews } from "../../api/newsHelper";
 
+function formatNewsDate(dateString) {
+  if (!dateString) return "";
+
+  // FORCE ISO parsing
+  const date = new Date(String(dateString).replace(" ", "T") + "Z");
+
+  const now = new Date();
+
+  const diffTime = now - date;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  const time = date.toLocaleTimeString("es-MX", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  if (diffDays === 0) return `Hoy · ${time}`;
+  if (diffDays === 1) return `Ayer · ${time}`;
+
+  return `${date.toLocaleDateString("es-MX")} · ${time}`;
+}
+
 export default function NewsSection() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +117,7 @@ export default function NewsSection() {
                 </Typography>
 
                 <Typography sx={{ fontSize: "0.8rem", color: "#8AA55A" }}>
-                  {item.date || item.created_at}
+                  {formatNewsDate(item.date || item.created_at)}
                 </Typography>
               </Box>
 

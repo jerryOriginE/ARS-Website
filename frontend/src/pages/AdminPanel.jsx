@@ -15,8 +15,8 @@ export default function AdminPanel() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [points, setPoints] = useState("");
 
-  const [content, setContent] = useState("");
-  const [label, setLabel] = useState("");
+  const [title, setTitle] = useState("");
+  const [area, setArea] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -25,6 +25,22 @@ export default function AdminPanel() {
     loadUsers();
     loadNews();
   }, []);
+
+  async function deleteNews(id) {
+    const res = await fetch(`${API_BASE_URL}/news/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      console.error(await res.text());
+      return;
+    }
+
+    loadNews();
+  }
 
   async function loadUsers() {
     const res = await fetch(`${API_BASE_URL}/auth/users`, {
@@ -37,6 +53,7 @@ export default function AdminPanel() {
   async function loadNews() {
     const res = await fetch(`${API_BASE_URL}/news`);
     const data = await res.json();
+  console.log("NEWS RESPONSE:", data);
     setNews(data);
   }
 
@@ -62,17 +79,25 @@ export default function AdminPanel() {
 
   // ---------------- NEWS ----------------
   async function createNews() {
-    await fetch(`${API_BASE_URL}/news`, {
+    const res = await fetch(`${API_BASE_URL}/news`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ content, label })
+      body: JSON.stringify({
+        title: title,
+        area: area
+      })
     });
 
-    setContent("");
-    setLabel("");
+    if (!res.ok) {
+      console.error("Failed to create news:", await res.text());
+      return;
+    }
+
+    setTitle("");
+    setArea("");
     loadNews();
   }
 
@@ -175,16 +200,16 @@ export default function AdminPanel() {
             <TextField
               fullWidth
               label="Content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               sx={{ mb: 2 }}
             />
 
             <TextField
               fullWidth
               label="Label"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
               sx={{ mb: 2 }}
             />
 
@@ -202,6 +227,13 @@ export default function AdminPanel() {
                   key={n.id}
                   sx={{ p: 2, mb: 1, border: "1px solid #D8EDAB" }}
                 >
+                  <Button
+                    color="error"
+                    variant="outlined"
+                    onClick={() => deleteNews(n.id)}
+                  >
+                    Delete
+                  </Button>
                   <Typography sx={{ fontWeight: 700 }}>
                     {n.content}
                   </Typography>

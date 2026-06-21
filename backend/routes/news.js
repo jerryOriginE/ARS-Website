@@ -23,4 +23,8 @@ router.get("/:id", getNewsById);
 router.post("/", authenticate, authorize("admin"), createNews);
 router.delete("/:id", authenticate, authorize("admin"), deleteNews);
 
+router.get("/health", (_, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 module.exports = router;

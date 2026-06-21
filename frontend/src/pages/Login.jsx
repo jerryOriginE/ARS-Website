@@ -219,6 +219,34 @@ export default function Login() {
                 Iniciar Sesión
               </Button>
 
+              {/* Register Link */}
+              <Typography
+                sx={{
+                  mt: 2,
+                  fontSize: '0.9rem',
+                  color: '#6B7280'
+                }}
+              >
+                ¿No tienes una cuenta?{' '}
+                <Button
+                  variant="text"
+                  onClick={() => navigate('/register')}
+                  sx={{
+                    padding: 0,
+                    minWidth: 'auto',
+                    fontSize: '0.9rem',
+                    color: '#6E9B2D',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      color: '#5C8626'
+                    }
+                  }}
+                >
+                  Regístrate
+                </Button>
+              </Typography>
+
               {/* FOOTER TEXT */}
               <Typography
                 sx={{
