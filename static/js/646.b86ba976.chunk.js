@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkarserver_frontend=self.webpackChunkarserver_frontend||[]).push([[646],{646(e,r,t){t.r(r),t.d(r,{default:()=>a});var s=t(3969),n=(t(6794),t(579));function a(){return(0,n.jsx)(s.A,{sx:{position:"fixed",inset:0,width:"100vw",height:"100vh",display:"flex",backgroundColor:"#111827",zIndex:1300},children:(0,n.jsx)("model-viewer",{src:"/pcb.gltf","camera-controls":!0,"auto-rotate":!0,"shadow-intensity":"1",exposure:"1.2",style:{width:"100%",height:"100%",background:"transparent",borderRadius:0}})})}}}]);
+//# sourceMappingURL=646.b86ba976.chunk.js.map
