@@ -1,26 +1,18 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const { render } = require("@react-email/render");
 const React = require("react");
 
 const VerifyEmail = require("../emails/VerifyEmail").default;
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const BASE_URL =
   process.env.BASE_URL || "http://localhost:5000";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT || 465),
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 async function sendVerificationEmail(to, token, username) {
   const verificationLink = `${BASE_URL}/auth/verify-email?token=${token}`;
 
-  // render TSX → HTML string
+  // render React email → HTML
   const emailHtml = render(
     React.createElement(VerifyEmail, {
       verificationLink,
@@ -28,8 +20,8 @@ async function sendVerificationEmail(to, token, username) {
     })
   );
 
-  await transporter.sendMail({
-    from: `"ARS - " <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: "ARS <noreply@balamserver.top>",
     to,
     subject: "Verifica tu correo electrónico",
     html: emailHtml,

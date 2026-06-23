@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const db = require("../db");
 const logEvent = require("../utils/logger");
 const crypto = require("crypto");
-//const { sendVerificationEmail } = require("../utils/mailer");
+const { sendVerificationEmail } = require("../utils/mailer");
 const { createNotification } = require("./notificationsController");
 
 const SECRET_KEY = process.env.JWT_SECRET || "ars-secret-key";
@@ -135,7 +135,7 @@ async function register(req, res) {
       })
       .returning(["id", "email"]);
 
-    //await sendVerificationEmail(newUser.email, token);
+    await sendVerificationEmail(newUser.email, token);
     // notify user and thanks for registration
     await createNotification(newUser.id, "Bienvenido a ARS!", "Gracias por registrarte en nuestro sistema de recompensas. ¡Explora las actividades y gana puntos para subir de nivel!");
 
