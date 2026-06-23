@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const db = require("../db");
 const logEvent = require("../utils/logger");
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../utils/mailer");
+//const { sendVerificationEmail } = require("../utils/mailer");
 const { createNotification } = require("./notificationsController");
 
 const SECRET_KEY = process.env.JWT_SECRET || "ars-secret-key";
@@ -195,6 +195,137 @@ async function verifyEmail(req, res) {
 }
 
 // --------------------
+// VERIFY USER 
+// --------------------
+// this will reicve qr data as
+//  {"company":"ARS","id":"4","username":"jerry","role":"member","generatedAt":"2026-06-22T01:24:46.177Z"}
+// and it must verify the user database to finda valid caldiate for all the data and return true or false and the user data if true
+async function verifyUser(req, res) {
+  const { company, id, username, role, generatedAt } = req.body;
+  console.log("Verifying user:", { company, id, username, role, generatedAt });
+  if (company !== "ARS") {
+    return res.status(400).json({ message: "Invalid company" });
+  }
+
+  try {
+    const user = await db("users")
+      .where({ id, username, role })
+      .first();
+
+    if (!user) {
+      console.log("User not found for verification:", { id, username, role });
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("User verified successfully:", { id, username, role });
+    
+    res.json({
+      valid: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        points: user.points,
+        level: calculateLevel(user.points || 0)
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Verification error" });
+  }
+}
+
+// server will recieve the user id and the type of waset we create a table 
+const POINTS_AWARD = {
+  "plastic": 10,
+  "glass": 15,
+  "metal": 20,
+  "trash": 5
+};
+
+// we alos log it in a new table called user_waste_log with user_id, waste_type, points_awarded, created_at
+async function awardPoints(req, res) {
+  const { userId, wasteType } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "Missing userId" });
+  }
+
+  if (!POINTS_AWARD[wasteType]) {
+    return res.status(400).json({ message: "Invalid waste type" });
+  }
+
+  try {
+    await addPoints(userId, POINTS_AWARD[wasteType]);
+
+    await db("user_waste_log").insert({
+      user_id: userId,
+      waste_type: wasteType,
+      points_awarded: POINTS_AWARD[wasteType],
+      created_at: db.fn.now(),
+    });
+
+    // we reurn the amount of points
+    res.json({
+      message: `Awarded ${POINTS_AWARD[wasteType]} points for ${wasteType}`,
+      points: POINTS_AWARD[wasteType],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error awarding points" });
+  }
+}
+
+async function getWasteLog(req, res) {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: "Missing userId" });
+  }
+
+  try {
+    const logs = await db("user_waste_log")
+      .where({ user_id: userId })
+      .select("waste_type", "points_awarded", "created_at")
+      .orderBy("created_at", "desc");
+
+    res.json(logs);
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching waste log" });
+  }
+}
+
+// this will log each session of the user (only needs userId)
+// expects { userId }
+// also when ending a session send a notification thanking the user for participating
+async function endSession(req, res) {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "Missing userId" });
+  }
+
+  try {
+    // insert a simple session log with timestamp. Table: sessions (user_id, ended_at)
+    await db("sessions").insert({ user_id: userId, ended_at: db.fn.now() });
+    // send a notification thanking the user for participating
+    try {
+      await createNotification(userId, "Gracias por participar", "Gracias por participar en la sesión. ¡Gracias por tu contribución!");
+    } catch (notifyErr) {
+      console.error("Notification error:", notifyErr);
+      // continue even if notification fails
+    }
+
+    res.json({ message: "Session logged" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error logging session" });
+  }
+}
+  
+// --------------------
 // PROFILE
 // --------------------
 async function getProfile(req, res) {
@@ -271,5 +402,9 @@ module.exports = {
   removePoints,
   addUserPoints,
   verifyEmail,
-  ensureAdminUser
+  verifyUser,
+  ensureAdminUser,
+  awardPoints,
+  endSession,
+  getWasteLog
 };

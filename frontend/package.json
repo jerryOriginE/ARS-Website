@@ -38,8 +38,7 @@
     "build": "react-scripts build",
     "postbuild": "node -e \"const fs=require('fs');fs.copyFileSync('build/index.html','build/404.html');\"",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "email": "email dev"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -60,12 +59,10 @@
     ]
   },
   "devDependencies": {
-    "@react-email/ui": "^6.6.3",
     "autoprefixer": "^10.5.0",
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.15",
     "react-app-rewired": "^2.2.1",
-    "react-email": "^6.6.3",
     "tailwindcss": "^4.3.0"
   }
 }

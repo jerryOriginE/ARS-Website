@@ -9,7 +9,11 @@ const {
   removePoints,
   addUserPoints,
   verifyEmail,
-  ensureAdminUser
+  verifyUser,
+  ensureAdminUser,
+  awardPoints,
+  endSession,
+  getWasteLog
 } = require("../controllers/authController");
 
 const authenticate = require("../middleware/auth");
@@ -32,6 +36,17 @@ router.get("/profile", authenticate, getProfile);
 // EMAIL VERIFY
 // --------------------
 router.get("/verify-email", verifyEmail);
+
+// --------------------
+// ARS
+// --------------------
+router.post("/verify-user", verifyUser);
+
+router.post("/award-points", awardPoints);
+
+router.post("/end-session", endSession);
+
+router.get("/history/:userId", getWasteLog);
 
 // --------------------
 // POINTS

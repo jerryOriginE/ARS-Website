@@ -79,6 +79,30 @@ async function initializeTables() {
       console.log('Created logs table');
     }
 
+    // sessions
+    const hasSessions = await db.schema.hasTable('sessions');
+    if (!hasSessions) {
+      await db.schema.createTable('sessions', (table) => {
+        table.increments('id').primary();
+        table.integer('user_id').references('id').inTable('users').onDelete('SET NULL');
+        table.timestamp('ended_at').defaultTo(db.fn.now());
+      });
+      console.log('Created sessions table');
+    }
+
+    //table called user_waste_log with user_id, waste_type, points_awarded, created_at
+    const hasUserWasteLog = await db.schema.hasTable('user_waste_log');
+    if (!hasUserWasteLog) {
+      await db.schema.createTable('user_waste_log', (table) => {
+        table.increments('id').primary();
+        table.integer('user_id').references('id').inTable('users').onDelete('SET NULL');
+        table.string('waste_type').notNullable();
+        table.integer('points_awarded').notNullable();
+        table.timestamp('created_at').defaultTo(db.fn.now());
+      });
+      console.log('Created user_waste_log table');
+    }
+
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Error initializing database:', err);
