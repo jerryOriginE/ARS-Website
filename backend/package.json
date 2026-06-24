@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "nodemon --exec \"npx tsx\" app.js",
+    "dev": "nodemon --exec \"npx tsx\" app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "email": "email dev"
   },
@@ -40,7 +40,8 @@
     "@react-email/ui": "^6.6.3",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10",
-    "react-email": "^6.6.3"
+    "react-email": "^6.6.3",
+    "tsx": "^4.22.4"
   },
   "proxy": "http://localhost:5000"
 }

@@ -23,10 +23,10 @@ function clampPoints(points) {
 // Ensure admin exists
 // --------------------
 async function ensureAdminUser() {
-  const admin = await db("users").where({ username: "admin" }).first();
+  const admin = await db("users").where({ username: process.env.ADMIN_USERNAME || "admin" }).first();
 
   if (!admin) {
-    const adminHash = bcrypt.hashSync("1233", 10);
+    const adminHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || "1233", 10);
 
     await db("users").insert({
       username: "admin",
@@ -140,7 +140,7 @@ async function register(req, res) {
     await createNotification(newUser.id, "Bienvenido a ARS!", "Gracias por registrarte en nuestro sistema de recompensas. ¡Explora las actividades y gana puntos para subir de nivel!");
 
 
-    const link = `http://localhost:5000/auth/verify-email?token=${token}`;
+    const link = `http://${process.env.BASE_URL}/auth/verify-email?token=${token}`;
 
     console.log("VERIFY USER LINK:", link);
 
